@@ -1,20 +1,99 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# EcoTrack
 
-# Run and deploy your AI Studio app
+EcoTrack is a smart waste management platform built for citizens, municipal administrators, and field workers. It helps users report waste-related issues, route complaints to the right team, and track resolution status from a single dashboard.
 
-This contains everything you need to run your app locally.
+## Features
 
-View your app in AI Studio: https://ai.studio/apps/cbdddc8c-2d1a-46e6-805b-11fa46b8bfc6
+- Citizen complaint reporting with title, description, location, and optional image URL
+- Role-based access for citizens, workers, and administrators
+- Admin dashboard with complaint overview, worker assignment, and analytics
+- Worker dashboard for assigned tasks and status updates
+- JWT-based authentication with protected routes
+- SQLite storage for users and complaints
+- Optional Gemini-powered complaint categorization when `GEMINI_API_KEY` is available
 
-## Run Locally
+## Tech Stack
 
-**Prerequisites:**  Node.js
+- React 19
+- TypeScript
+- Vite
+- Express
+- SQLite with better-sqlite3
+- Tailwind CSS
+- React Router
+- Recharts
+- Motion
 
+## Project Structure
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+- `src/` - Frontend pages, components, context, and utilities
+- `backend/` - Express routes, middleware, and database setup
+- `server.ts` - Main server entry that serves the API and Vite app in development
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18 or later
+- npm
+
+### Install Dependencies
+
+```bash
+npm install
+```
+
+### Environment Variables
+
+Create a `.env` file in the project root if you want to use AI-based complaint categorization or a custom JWT secret:
+
+```bash
+GEMINI_API_KEY=your_gemini_api_key
+JWT_SECRET=your_jwt_secret
+```
+
+If `GEMINI_API_KEY` is not set, complaint categorization falls back to a default category.
+
+### Run the App
+
+```bash
+npm run dev
+```
+
+The application runs on `http://localhost:3000`.
+
+### Build for Production
+
+```bash
+npm run build
+```
+
+### Preview the Production Build
+
+```bash
+npm run preview
+```
+
+## Available Scripts
+
+- `npm run dev` - Start the Express server with Vite middleware
+- `npm run build` - Build the frontend for production
+- `npm run preview` - Preview the production build locally
+- `npm run lint` - Type-check the project
+- `npm run clean` - Remove the `dist/` folder
+
+## Roles
+
+- Citizen: Report issues and view personal complaints
+- Worker: View assigned complaints and update progress
+- Admin: Review all complaints, assign workers, and view analytics
+
+## Data Storage
+
+The app stores data in a local SQLite database file named `waste_management.db`. The database is created automatically on first run.
+
+## Notes
+
+- Complaint requests are protected with JWT authentication.
+- Admin endpoints are restricted to admin users.
+- Worker updates are limited to tasks assigned to that worker.
