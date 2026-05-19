@@ -1,8 +1,8 @@
-# EcoTrack
+# SafaiSetu
 
 EcoTrack is a smart waste management platform built for citizens, municipal administrators, and field workers. It helps users report waste-related issues, route complaints to the right team, and track resolution status from a single dashboard.
 
-## Features
+## SafaiSetu
 
 - Citizen complaint reporting with title, description, location, and optional image URL
 - Role-based access for citizens, workers, and administrators
