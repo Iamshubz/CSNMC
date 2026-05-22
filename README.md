@@ -26,9 +26,9 @@ SafaiSetu is a smart waste management platform built for citizens, municipal adm
 
 ## Project Structure
 
-- `src/` - Frontend pages, components, context, and utilities
-- `backend/` - Express routes, middleware, and database setup
-- `server.ts` - Main server entry that serves the API and Vite app in development
+- `frontend/` - Vite app, HTML entry, and React source code
+- `backend/` - Express server entry, routes, middleware, and database setup
+- `backend/server.ts` - Main server entry that serves the API and Vite app in development
 
 ## Getting Started
 
@@ -68,6 +68,8 @@ The application runs on `http://localhost:3000`.
 npm run build
 ```
 
+The production frontend build is output to `frontend/dist`.
+
 ### Preview the Production Build
 
 ```bash
@@ -77,10 +79,10 @@ npm run preview
 ## Available Scripts
 
 - `npm run dev` - Start the Express server with Vite middleware
-- `npm run build` - Build the frontend for production
-- `npm run preview` - Preview the production build locally
+- `npm run build` - Build the frontend for production from `frontend/`
+- `npm run preview` - Preview the production build locally from `frontend/dist`
 - `npm run lint` - Type-check the project
-- `npm run clean` - Remove the `dist/` folder
+- `npm run clean` - Remove the `frontend/dist/` folder
 
 ## Roles
 
