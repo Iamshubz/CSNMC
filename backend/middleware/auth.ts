@@ -15,3 +15,7 @@ export const authenticateToken = (req: any, res: any, next: any) => {
 };
 
 export { JWT_SECRET };
+
+export const signJwt = (payload: object, options: object = {}) => {
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d', ...options });
+};
