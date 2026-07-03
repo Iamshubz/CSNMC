@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { LayoutDashboard, CheckCircle2, Clock, AlertCircle, Loader2, LogOut, Briefcase } from 'lucide-react';
+import { LayoutDashboard, CheckCircle2, Clock, AlertCircle, Loader2, LogOut, Briefcase, Menu } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { fetchApi } from '../lib/utils';
 import { Complaint } from '../types';
 import { ComplaintCard } from '../components/ComplaintCard';
+import { MobileSidebar } from '../components/MobileSidebar';
 
 export const WorkerDashboard = () => {
   const { user, logout } = useAuth();
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+
+  const scrollToSection = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   useEffect(() => {
     loadComplaints();
@@ -45,7 +51,43 @@ export const WorkerDashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 flex">
+    <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row overflow-x-hidden">
+      <header className="md:hidden sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur px-4 py-3 flex items-center justify-between gap-3">
+        <button
+          type="button"
+          onClick={() => setIsMobileNavOpen(true)}
+          className="inline-flex items-center justify-center rounded-full border border-slate-200 p-2 text-slate-700"
+          aria-label="Open navigation menu"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+        <div className="min-w-0 flex-1 text-center">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400">EcoTrack</p>
+          <h1 className="text-lg font-bold text-slate-900 truncate">Worker Portal</h1>
+        </div>
+        <button
+          onClick={logout}
+          className="flex items-center gap-2 rounded-full border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700"
+        >
+          <LogOut className="w-4 h-4" />
+          Exit
+        </button>
+      </header>
+
+      <MobileSidebar
+        open={isMobileNavOpen}
+        title="EcoTrack Worker"
+        subtitle="Task navigation"
+        icon={<Briefcase className="w-6 h-6" />}
+        accentClassName="text-indigo-600"
+        navItems={[
+          { label: 'My Tasks', icon: <LayoutDashboard className="w-5 h-5" />, onClick: () => scrollToSection('worker-tasks'), active: true },
+        ]}
+        onClose={() => setIsMobileNavOpen(false)}
+        onLogout={logout}
+        logoutLabel="Logout"
+      />
+
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-slate-200 hidden md:flex flex-col">
         <div className="p-6 border-b border-slate-100">
@@ -72,10 +114,10 @@ export const WorkerDashboard = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-4 md:p-8 overflow-y-auto">
+      <main className="flex-1 p-4 md:p-8 overflow-y-auto min-w-0">
         <div className="max-w-5xl mx-auto">
-          <header className="mb-8">
-            <h1 className="text-2xl font-bold text-slate-900">Worker Portal</h1>
+          <header id="worker-top" className="mb-8 scroll-mt-24">
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Worker Portal</h1>
             <p className="text-slate-500">Manage your assigned waste collection tasks.</p>
           </header>
 
@@ -104,7 +146,7 @@ export const WorkerDashboard = () => {
                 ))}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div id="worker-tasks" className="grid grid-cols-1 md:grid-cols-2 gap-6 scroll-mt-24">
                 {complaints.length === 0 ? (
                   <div className="col-span-full py-12 text-center text-slate-500 bg-white rounded-2xl border border-dashed border-slate-200">
                     You have no assigned tasks at the moment.

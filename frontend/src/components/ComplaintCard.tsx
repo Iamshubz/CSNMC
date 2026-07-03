@@ -39,10 +39,10 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
     <motion.div 
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow"
+      className="bg-white border border-slate-200 rounded-xl p-4 sm:p-5 shadow-sm hover:shadow-md transition-shadow min-w-0"
     >
-      <div className="flex justify-between items-start mb-4">
-        <div>
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 mb-4">
+        <div className="min-w-0">
           <span className={cn(
             "px-2.5 py-0.5 rounded-full text-xs font-medium border flex items-center gap-1 w-fit mb-2",
             statusColors[complaint.status]
@@ -50,10 +50,10 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
             {statusIcons[complaint.status]}
             {complaint.status.replace('_', ' ')}
           </span>
-          <h3 className="text-lg font-semibold text-slate-900">{complaint.title}</h3>
-          <p className="text-xs text-slate-500 font-mono mt-1">ID: #{complaint.id} • {new Date(complaint.created_at).toLocaleDateString()}</p>
+          <h3 className="text-lg font-semibold text-slate-900 break-words">{complaint.title}</h3>
+          <p className="text-xs text-slate-500 font-mono mt-1 break-words">ID: #{complaint.id} • {new Date(complaint.created_at).toLocaleDateString()}</p>
         </div>
-        <div className="text-right">
+        <div className="text-left sm:text-right">
            <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">{complaint.category}</span>
         </div>
       </div>
@@ -76,16 +76,16 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
         </div>
       )}
 
-      <div className="pt-4 border-t border-slate-100 flex flex-wrap gap-3 items-center justify-between">
-        <div className="flex items-center gap-2 text-xs text-slate-500">
+      <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+        <div className="flex items-center gap-2 text-xs text-slate-500 min-w-0">
           <UserIcon className="w-3.5 h-3.5" />
-          <span>Reported by: {complaint.citizen_name || 'Citizen'}</span>
+          <span className="break-words">Reported by: {complaint.citizen_name || 'Citizen'}</span>
         </div>
 
         {isAdmin && complaint.status === 'PENDING' && workers && (
           <div className="flex items-center gap-2">
             <select 
-              className="text-xs border border-slate-200 rounded-md px-2 py-1 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="text-xs border border-slate-200 rounded-md px-2 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 max-w-full"
               onChange={(e) => onAssign?.(complaint.id, parseInt(e.target.value))}
               defaultValue=""
             >
@@ -98,11 +98,11 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
         )}
 
         {isWorker && complaint.status !== 'RESOLVED' && (
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             {complaint.status === 'ASSIGNED' && (
               <button 
                 onClick={() => onUpdateStatus?.(complaint.id, 'IN_PROGRESS')}
-                className="text-xs bg-indigo-600 text-white px-3 py-1.5 rounded-md hover:bg-indigo-700 transition-colors"
+                className="text-xs bg-indigo-600 text-white px-3 py-2 rounded-md hover:bg-indigo-700 transition-colors w-full sm:w-auto"
               >
                 Start Work
               </button>
@@ -110,7 +110,7 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
             {complaint.status === 'IN_PROGRESS' && (
               <button 
                 onClick={() => onUpdateStatus?.(complaint.id, 'RESOLVED')}
-                className="text-xs bg-emerald-600 text-white px-3 py-1.5 rounded-md hover:bg-emerald-700 transition-colors"
+                className="text-xs bg-emerald-600 text-white px-3 py-2 rounded-md hover:bg-emerald-700 transition-colors w-full sm:w-auto"
               >
                 Mark Resolved
               </button>

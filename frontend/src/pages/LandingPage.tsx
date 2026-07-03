@@ -7,19 +7,19 @@ export const LandingPage = () => {
   return (
     <div className="min-h-screen bg-white text-slate-900">
       {/* Navbar */}
-      <nav className="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
+      <nav className="max-w-7xl mx-auto px-4 py-4 sm:h-20 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2 text-emerald-600 font-bold text-2xl">
           <Leaf className="w-8 h-8" />
           EcoTrack
         </div>
-        <div className="flex items-center gap-6">
-          <Link to="/login" className="text-slate-600 font-medium hover:text-emerald-600 transition-colors">Login</Link>
-          <Link to="/register" className="bg-emerald-600 text-white px-5 py-2 rounded-full font-semibold hover:bg-emerald-700 transition-colors">Get Started</Link>
+        <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center sm:gap-6">
+          <Link to="/login" className="text-slate-600 font-medium hover:text-emerald-600 transition-colors text-center">Login</Link>
+          <Link to="/register" className="bg-emerald-600 text-white px-5 py-2 rounded-full font-semibold hover:bg-emerald-700 transition-colors text-center">Get Started</Link>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="max-w-7xl mx-auto px-4 py-20 lg:py-32 grid lg:grid-cols-2 gap-12 items-center">
+      <section className="max-w-7xl mx-auto px-4 py-12 sm:py-16 lg:py-32 grid lg:grid-cols-2 gap-10 lg:gap-12 items-center">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -28,17 +28,17 @@ export const LandingPage = () => {
           <span className="inline-block px-4 py-1.5 bg-emerald-50 text-emerald-700 rounded-full text-sm font-bold mb-6">
             SMART CITY INITIATIVE
           </span>
-          <h1 className="text-5xl lg:text-7xl font-bold tracking-tight leading-[1.1] mb-6">
+          <h1 className="text-3xl sm:text-4xl lg:text-7xl font-bold tracking-tight leading-[1.1] mb-6">
             Keeping our city <span className="text-emerald-600">clean</span> and <span className="text-emerald-600">green</span>.
           </h1>
-          <p className="text-xl text-slate-500 mb-10 max-w-lg">
+          <p className="text-base sm:text-lg lg:text-xl text-slate-500 mb-10 max-w-lg">
             A modern waste management system that connects citizens, municipal authorities, and workers to resolve waste issues faster than ever.
           </p>
-          <div className="flex flex-wrap gap-4">
-            <Link to="/register" className="bg-emerald-600 text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-200 flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Link to="/register" className="bg-emerald-600 text-white px-6 sm:px-8 py-3.5 sm:py-4 rounded-full font-bold text-base sm:text-lg hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-200 flex items-center justify-center gap-2 w-full sm:w-auto">
               Report an Issue <ArrowRight className="w-5 h-5" />
             </Link>
-            <Link to="/login" className="bg-white text-slate-900 border border-slate-200 px-8 py-4 rounded-full font-bold text-lg hover:bg-slate-50 transition-all">
+            <Link to="/login" className="bg-white text-slate-900 border border-slate-200 px-6 sm:px-8 py-3.5 sm:py-4 rounded-full font-bold text-base sm:text-lg hover:bg-slate-50 transition-all text-center w-full sm:w-auto">
               View Dashboard
             </Link>
           </div>
@@ -51,7 +51,7 @@ export const LandingPage = () => {
           className="relative"
         >
           <div className="absolute -inset-4 bg-emerald-100 rounded-[2rem] -rotate-2"></div>
-          <div className="relative bg-slate-900 rounded-[2rem] overflow-hidden shadow-2xl aspect-video lg:aspect-square flex items-center justify-center">
+          <div className="relative bg-slate-900 rounded-[2rem] overflow-hidden shadow-2xl aspect-[4/3] sm:aspect-video lg:aspect-square flex items-center justify-center">
              <img 
                src="https://picsum.photos/seed/city-clean/800/800" 
                alt="Clean City" 
@@ -74,10 +74,10 @@ export const LandingPage = () => {
       </section>
 
       {/* Features */}
-      <section className="bg-slate-50 py-24">
+      <section className="bg-slate-50 py-16 sm:py-24">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold mb-4">How it works</h2>
+          <div className="text-center mb-12 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-4">How it works</h2>
             <p className="text-slate-500 max-w-2xl mx-auto">Our platform streamlines the entire waste management process from reporting to resolution.</p>
           </div>
 
@@ -100,8 +100,8 @@ export const LandingPage = () => {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 border-t border-slate-100">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6">
+      <footer className="py-10 sm:py-12 border-t border-slate-100">
+        <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4 sm:gap-6 text-center md:text-left">
           <div className="flex items-center gap-2 text-emerald-600 font-bold text-xl">
             <Leaf className="w-6 h-6" />
             EcoTrack
