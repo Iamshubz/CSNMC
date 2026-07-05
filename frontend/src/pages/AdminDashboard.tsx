@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { LayoutDashboard, Users, FileText, CheckCircle2, Clock, AlertCircle, Filter, Loader2, LogOut, BarChart3, ShieldCheck } from 'lucide-react';
+import { LayoutDashboard, Users, FileText, CheckCircle2, Clock, AlertCircle, Filter, Loader2, LogOut, BarChart3, ShieldCheck, Menu } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { fetchApi, cn } from '../lib/utils';
 import { Complaint, Analytics, User } from '../types';
 import { ComplaintCard } from '../components/ComplaintCard';
 import { AnalyticsCharts } from '../components/AnalyticsCharts';
+import { MobileSidebar } from '../components/MobileSidebar';
 
 export const AdminDashboard = () => {
   const { logout } = useAuth();
@@ -14,6 +15,11 @@ export const AdminDashboard = () => {
   const [workers, setWorkers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('ALL');
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+
+  const scrollToSection = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   useEffect(() => {
     loadData();
@@ -60,7 +66,45 @@ export const AdminDashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50 flex">
+    <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row overflow-x-hidden">
+      <header className="md:hidden sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur px-4 py-3 flex items-center justify-between gap-3">
+        <button
+          type="button"
+          onClick={() => setIsMobileNavOpen(true)}
+          className="inline-flex items-center justify-center rounded-full border border-slate-200 p-2 text-slate-700"
+          aria-label="Open navigation menu"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+        <div className="min-w-0 flex-1 text-center">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-slate-400">EcoTrack</p>
+          <h1 className="text-lg font-bold text-slate-900 truncate">Admin Dashboard</h1>
+        </div>
+        <button
+          onClick={logout}
+          className="flex items-center gap-2 rounded-full border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700"
+        >
+          <LogOut className="w-4 h-4" />
+          Exit
+        </button>
+      </header>
+
+      <MobileSidebar
+        open={isMobileNavOpen}
+        title="EcoTrack Admin"
+        subtitle="Municipal navigation"
+        icon={<ShieldCheck className="w-6 h-6" />}
+        accentClassName="text-emerald-600"
+        navItems={[
+          { label: 'Overview', icon: <LayoutDashboard className="w-5 h-5" />, onClick: () => scrollToSection('admin-overview'), active: true },
+          { label: 'Analytics', icon: <BarChart3 className="w-5 h-5" />, onClick: () => scrollToSection('admin-analytics') },
+          { label: 'Workers', icon: <Users className="w-5 h-5" />, onClick: () => scrollToSection('admin-workers') },
+        ]}
+        onClose={() => setIsMobileNavOpen(false)}
+        onLogout={logout}
+        logoutLabel="Logout"
+      />
+
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-slate-200 hidden md:flex flex-col">
         <div className="p-6 border-b border-slate-100">
@@ -95,10 +139,10 @@ export const AdminDashboard = () => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-4 md:p-8 overflow-y-auto">
+      <main className="flex-1 p-4 md:p-8 overflow-y-auto min-w-0">
         <div className="max-w-6xl mx-auto">
-          <header className="mb-8">
-            <h1 className="text-2xl font-bold text-slate-900">Municipal Dashboard</h1>
+          <header id="admin-overview" className="mb-8 scroll-mt-24">
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Municipal Dashboard</h1>
             <p className="text-slate-500">Manage city-wide waste reports and worker assignments.</p>
           </header>
 
@@ -129,21 +173,21 @@ export const AdminDashboard = () => {
 
               {/* Charts */}
               {analytics && (
-                <div className="mb-8">
+                <div id="admin-analytics" className="mb-8 scroll-mt-24">
                   <AnalyticsCharts data={analytics.byCategory} />
                 </div>
               )}
 
               {/* Complaints Section */}
-              <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-                <div className="p-6 border-b border-slate-100 flex flex-wrap justify-between items-center gap-4">
+              <div id="admin-workers" className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden scroll-mt-24">
+                <div className="p-4 sm:p-6 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                   <h2 className="text-lg font-bold text-slate-900">Recent Complaints</h2>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 w-full sm:w-auto">
                     <Filter className="w-4 h-4 text-slate-400" />
                     <select 
                       value={filter}
                       onChange={(e) => setFilter(e.target.value)}
-                      className="text-sm border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      className="text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 w-full sm:w-auto"
                     >
                       <option value="ALL">All Status</option>
                       <option value="PENDING">Pending</option>
@@ -153,7 +197,7 @@ export const AdminDashboard = () => {
                     </select>
                   </div>
                 </div>
-                <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="p-4 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                   {filteredComplaints.length === 0 ? (
                     <div className="col-span-full py-12 text-center text-slate-500">
                       No complaints found matching the criteria.

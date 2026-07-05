@@ -9,10 +9,10 @@ const COLORS = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'
 
 export const AnalyticsCharts: React.FC<AnalyticsChartsProps> = ({ data }) => {
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+    <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+      <div className="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm min-w-0 overflow-hidden">
         <h3 className="text-lg font-semibold text-slate-800 mb-6">Complaints by Category</h3>
-        <div className="h-[300px]">
+        <div className="h-[240px] sm:h-[300px]">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -37,9 +37,9 @@ export const AnalyticsCharts: React.FC<AnalyticsChartsProps> = ({ data }) => {
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+      <div className="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-sm min-w-0 overflow-hidden">
         <h3 className="text-lg font-semibold text-slate-800 mb-6">Category Distribution</h3>
-        <div className="h-[300px]">
+        <div className="h-[240px] sm:h-[300px]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data}>
               <XAxis dataKey="name" axisLine={false} tickLine={false} fontSize={12} />
