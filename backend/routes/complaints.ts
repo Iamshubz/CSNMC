@@ -1,14 +1,22 @@
 import express from "express";
 import db from "../db/database";
 import { authenticateToken } from "../middleware/auth";
-import { GoogleGenAI } from "@google/genai";
 
 const router = express.Router();
 
-// Initialize AI client only if API key is available
-const ai = process.env.GEMINI_API_KEY 
-  ? new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY })
-  : null;
+const getAiClient = async () => {
+  if (!process.env.GEMINI_API_KEY) {
+    return null;
+  }
+
+  try {
+    const { GoogleGenAI } = await import("@google/genai");
+    return new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+  } catch (error) {
+    console.warn("Gemini AI client unavailable, skipping categorization", error);
+    return null;
+  }
+};
 
 // Get Complaints
 router.get("/", authenticateToken, (req: any, res) => {
@@ -35,6 +43,7 @@ router.post("/", authenticateToken, async (req: any, res) => {
   
   // AI Categorization
   let category = "General";
+  const ai = await getAiClient();
   if (ai) {
     try {
       const response = await ai.models.generateContent({

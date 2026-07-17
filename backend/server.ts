@@ -1,43 +1,35 @@
 import express from "express";
-import path from "node:path";
-import { createServer as createViteServer } from "vite";
-import dotenv from "dotenv";
-import authRoutes from "./routes/auth";
-import complaintRoutes from "./routes/complaints";
-import adminRoutes from "./routes/admin";
-
-dotenv.config();
+import authRouter from "./routes/auth";
+import complaintsRouter from "./routes/complaints";
+import adminRouter from "./routes/admin";
 
 const app = express();
-app.use(express.json());
-const frontendRoot = path.resolve(process.cwd(), "frontend");
+const port = Number(process.env.PORT || 3001);
 
-// --- API Routes ---
-app.use("/api/auth", authRoutes);
-app.use("/api/complaints", complaintRoutes);
-app.use("/api", adminRoutes);
+app.use(express.json({ limit: "10mb" }));
 
-// Vite middleware for development
-async function startServer() {
-  if (process.env.NODE_ENV !== "production") {
-    const vite = await createViteServer({
-      root: frontendRoot,
-      configFile: path.resolve(frontendRoot, "vite.config.ts"),
-      server: { middlewareMode: true },
-      appType: "spa",
-    });
-    app.use(vite.middlewares);
-  } else {
-    app.use(express.static(path.resolve(frontendRoot, "dist")));
-    app.get("*", (req, res) => {
-      res.sendFile(path.resolve(frontendRoot, "dist", "index.html"));
-    });
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
   }
+  next();
+});
 
-  const PORT = 3000;
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
-}
+app.get("/api/health", (_req, res) => {
+  res.json({ ok: true });
+});
 
-startServer();
+app.use("/api/auth", authRouter);
+app.use("/api/complaints", complaintsRouter);
+app.use("/api", adminRouter);
+
+app.get("/", (_req, res) => {
+  res.send("CSNMC backend is running");
+});
+
+app.listen(port, () => {
+  console.log(`Backend listening on http://localhost:${port}`);
+});

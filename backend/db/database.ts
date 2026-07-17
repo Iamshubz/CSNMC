@@ -1,6 +1,8 @@
+import path from "path";
 import Database from "better-sqlite3";
 
-const db = new Database("waste_management.db");
+const dbPath = path.resolve(__dirname, "../../waste_management.db");
+const db = new Database(dbPath);
 
 // Initialize Database
 db.exec(`
