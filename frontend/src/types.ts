@@ -18,6 +18,14 @@ export interface Complaint {
   worker_id?: number;
   image_url?: string;
   proof_image_url?: string;
+  captured_at?: string;
+  capture_latitude?: number | null;
+  capture_longitude?: number | null;
+  capture_accuracy?: number | null;
+  risk_score?: number;
+  risk_level?: 'LOW' | 'MEDIUM' | 'HIGH';
+  risk_reason?: string;
+  moderation_status?: 'AUTO_APPROVED' | 'REVIEW_REQUIRED';
   created_at: string;
   citizen_name?: string;
   worker_name?: string;
