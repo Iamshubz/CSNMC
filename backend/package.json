@@ -3,12 +3,13 @@
   "private": true,
   "version": "1.0.0",
   "scripts": {
-    "dev": "node ../node_modules/tsx/dist/cli.mjs server.ts",
-    "start": "node ../node_modules/tsx/dist/cli.mjs server.ts"
+    "dev": "tsx server.ts",
+    "start": "tsx server.ts"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "better-sqlite3": "^12.6.2",
+    "dotenv": "^17.4.2",
     "express": "^4.22.1",
     "jsonwebtoken": "^9.0.3"
   },

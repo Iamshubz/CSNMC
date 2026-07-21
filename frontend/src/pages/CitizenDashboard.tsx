@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Plus, MapPin, FileText, Camera, Send, X, Loader2, History, LayoutDashboard, LogOut, Menu } from 'lucide-react';
+import { Plus, MapPin, FileText, Send, X, Loader2, History, LayoutDashboard, LogOut, Menu } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { fetchApi } from '../lib/utils';
 import { Complaint } from '../types';
 import { ComplaintCard } from '../components/ComplaintCard';
 import { cn } from '../lib/utils';
 import { MobileSidebar } from '../components/MobileSidebar';
+import { LiveCameraCapture, type CaptureMetadata } from '../components/LiveCameraCapture';
 
 export const CitizenDashboard = () => {
   const { user, logout } = useAuth();
@@ -15,12 +16,17 @@ export const CitizenDashboard = () => {
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [photoCaptureError, setPhotoCaptureError] = useState('');
   
   const [newComplaint, setNewComplaint] = useState({
     title: '',
     description: '',
     location: '',
-    image_url: ''
+    image_url: '',
+    captured_at: '',
+    capture_latitude: null as number | null,
+    capture_longitude: null as number | null,
+    capture_accuracy: null as number | null,
   });
 
   const scrollToSection = (id: string) => {
@@ -44,6 +50,11 @@ export const CitizenDashboard = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!newComplaint.image_url) {
+      setPhotoCaptureError('Please capture a live photo before submitting.');
+      return;
+    }
+
     setSubmitting(true);
     try {
       await fetchApi('/api/complaints', {
@@ -51,7 +62,17 @@ export const CitizenDashboard = () => {
         body: JSON.stringify(newComplaint),
       });
       setIsModalOpen(false);
-      setNewComplaint({ title: '', description: '', location: '', image_url: '' });
+      setNewComplaint({
+        title: '',
+        description: '',
+        location: '',
+        image_url: '',
+        captured_at: '',
+        capture_latitude: null,
+        capture_longitude: null,
+        capture_accuracy: null,
+      });
+      setPhotoCaptureError('');
       loadComplaints();
     } catch (err) {
       console.error(err);
@@ -199,6 +220,36 @@ export const CitizenDashboard = () => {
 
               <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4">
                 <div>
+                  <label className="block text-sm font-medium text-slate-700 mb-1">Live Photo</label>
+                  <p className="text-xs text-slate-500 mb-3">Take a fresh picture from the device camera. Gallery uploads are disabled.</p>
+                  <LiveCameraCapture
+                    value={newComplaint.image_url}
+                    onCapture={(metadata: CaptureMetadata) => {
+                      setPhotoCaptureError('');
+                      setNewComplaint({
+                        ...newComplaint,
+                        image_url: metadata.imageUrl,
+                        captured_at: metadata.capturedAt,
+                        capture_latitude: metadata.captureLatitude,
+                        capture_longitude: metadata.captureLongitude,
+                        capture_accuracy: metadata.captureAccuracy,
+                      });
+                    }}
+                    onClear={() => setNewComplaint({
+                      ...newComplaint,
+                      image_url: '',
+                      captured_at: '',
+                      capture_latitude: null,
+                      capture_longitude: null,
+                      capture_accuracy: null,
+                    })}
+                  />
+                  {photoCaptureError && (
+                    <p className="mt-2 text-sm text-red-600">{photoCaptureError}</p>
+                  )}
+                </div>
+
+                <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Title</label>
                   <input 
                     type="text" 
@@ -237,24 +288,10 @@ export const CitizenDashboard = () => {
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Image URL (Optional)</label>
-                  <div className="relative">
-                    <Camera className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                    <input 
-                      type="url" 
-                      value={newComplaint.image_url}
-                      onChange={(e) => setNewComplaint({ ...newComplaint, image_url: e.target.value })}
-                      className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                      placeholder="https://example.com/image.jpg"
-                    />
-                  </div>
-                </div>
-
                 <div className="pt-4">
                   <button 
                     type="submit" 
-                    disabled={submitting}
+                    disabled={submitting || !newComplaint.image_url}
                     className="w-full bg-emerald-600 text-white py-3 rounded-xl font-bold hover:bg-emerald-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
                   >
                     {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}

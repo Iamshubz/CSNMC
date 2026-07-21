@@ -27,6 +27,12 @@ const statusIcons = {
   RESOLVED: <CheckCircle2 className="w-4 h-4" />,
 };
 
+const riskStyles = {
+  LOW: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  MEDIUM: 'bg-amber-50 text-amber-700 border-amber-200',
+  HIGH: 'bg-rose-50 text-rose-700 border-rose-200',
+};
+
 export const ComplaintCard: React.FC<ComplaintCardProps> = ({ 
   complaint, 
   onUpdateStatus, 
@@ -55,6 +61,14 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
         </div>
         <div className="text-left sm:text-right">
            <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">{complaint.category}</span>
+           {complaint.risk_level && (
+             <div className={cn(
+               'mt-2 inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide',
+               riskStyles[complaint.risk_level]
+             )}>
+               {complaint.moderation_status === 'REVIEW_REQUIRED' ? 'Needs review' : 'Auto approved'}
+             </div>
+           )}
         </div>
       </div>
 
@@ -74,6 +88,24 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
             referrerPolicy="no-referrer"
           />
         </div>
+      )}
+
+      {(complaint.capture_latitude !== undefined || complaint.capture_longitude !== undefined || complaint.captured_at) && (
+        <div className="mb-4 rounded-lg border border-slate-100 bg-slate-50 p-3 text-xs text-slate-600 space-y-1">
+          {complaint.captured_at && <p>Captured at: {new Date(complaint.captured_at).toLocaleString()}</p>}
+          {(complaint.capture_latitude !== null && complaint.capture_longitude !== null) && (
+            <p>
+              GPS: {complaint.capture_latitude?.toFixed(5)}, {complaint.capture_longitude?.toFixed(5)}
+              {complaint.capture_accuracy !== null && complaint.capture_accuracy !== undefined && ` • Accuracy ${Math.round(complaint.capture_accuracy)}m`}
+            </p>
+          )}
+        </div>
+      )}
+
+      {complaint.risk_reason && (
+        <p className="mb-4 text-xs text-slate-500">
+          Review note: {complaint.risk_reason}
+        </p>
       )}
 
       <div className="pt-4 border-t border-slate-100 flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">

@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from "express";
 import authRouter from "./routes/auth";
 import complaintsRouter from "./routes/complaints";
@@ -27,7 +28,7 @@ app.use("/api/complaints", complaintsRouter);
 app.use("/api", adminRouter);
 
 app.get("/", (_req, res) => {
-  res.send("CSNMC backend is running");
+  res.send("BACKEND BOHT BADHIYA CHAL RAHA HAI BOSS");
 });
 
 app.listen(port, () => {
