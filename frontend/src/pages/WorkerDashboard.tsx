@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { LayoutDashboard, CheckCircle2, Clock, AlertCircle, Loader2, LogOut, Briefcase, Menu } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { fetchApi } from '../lib/utils';
+import { fetchApi, cn } from '../lib/utils';
 import { Complaint } from '../types';
 import { ComplaintCard } from '../components/ComplaintCard';
 import { MobileSidebar } from '../components/MobileSidebar';
@@ -12,9 +12,17 @@ export const WorkerDashboard = () => {
   const [complaints, setComplaints] = useState<Complaint[]>([]);
   const [loading, setLoading] = useState(true);
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState<'tasks'>('tasks');
+  const [statusFilter, setStatusFilter] = useState<'ALL' | 'ASSIGNED' | 'IN_PROGRESS' | 'RESOLVED'>('ALL');
 
-  const scrollToSection = (id: string) => {
+  const scrollToSection = (id: string, section: 'tasks') => {
+    setActiveSection(section);
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const handleStatClick = (status: 'ALL' | 'ASSIGNED' | 'IN_PROGRESS' | 'RESOLVED') => {
+    setStatusFilter(status);
+    scrollToSection('worker-tasks', 'tasks');
   };
 
   useEffect(() => {
@@ -45,10 +53,14 @@ export const WorkerDashboard = () => {
   };
 
   const stats = [
-    { label: 'Assigned', value: complaints.filter(c => c.status === 'ASSIGNED').length, icon: <AlertCircle className="w-5 h-5" />, color: 'text-blue-600', bg: 'bg-blue-50' },
-    { label: 'In Progress', value: complaints.filter(c => c.status === 'IN_PROGRESS').length, icon: <Clock className="w-5 h-5" />, color: 'text-indigo-600', bg: 'bg-indigo-50' },
-    { label: 'Completed', value: complaints.filter(c => c.status === 'RESOLVED').length, icon: <CheckCircle2 className="w-5 h-5" />, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+    { label: 'Assigned', value: complaints.filter(c => c.status === 'ASSIGNED').length, icon: <AlertCircle className="w-5 h-5" />, color: 'text-blue-600', bg: 'bg-blue-50', status: 'ASSIGNED' as const },
+    { label: 'In Progress', value: complaints.filter(c => c.status === 'IN_PROGRESS').length, icon: <Clock className="w-5 h-5" />, color: 'text-indigo-600', bg: 'bg-indigo-50', status: 'IN_PROGRESS' as const },
+    { label: 'Completed', value: complaints.filter(c => c.status === 'RESOLVED').length, icon: <CheckCircle2 className="w-5 h-5" />, color: 'text-emerald-600', bg: 'bg-emerald-50', status: 'RESOLVED' as const },
   ];
+
+  const filteredComplaints = statusFilter === 'ALL'
+    ? complaints
+    : complaints.filter((complaint) => complaint.status === statusFilter);
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row overflow-x-hidden">
@@ -81,7 +93,7 @@ export const WorkerDashboard = () => {
         icon={<Briefcase className="w-6 h-6" />}
         accentClassName="text-indigo-600"
         navItems={[
-          { label: 'My Tasks', icon: <LayoutDashboard className="w-5 h-5" />, onClick: () => scrollToSection('worker-tasks'), active: true },
+          { label: 'My Tasks', icon: <LayoutDashboard className="w-5 h-5" />, onClick: () => scrollToSection('worker-tasks', 'tasks'), active: activeSection === 'tasks' },
         ]}
         onClose={() => setIsMobileNavOpen(false)}
         onLogout={logout}
@@ -97,7 +109,16 @@ export const WorkerDashboard = () => {
           </div>
         </div>
         <nav className="flex-1 p-4 space-y-2">
-          <button className="w-full flex items-center gap-3 px-4 py-2.5 bg-indigo-50 text-indigo-700 rounded-lg font-medium">
+          <button
+            type="button"
+            onClick={() => scrollToSection('worker-tasks', 'tasks')}
+            className={cn(
+              'w-full flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium transition-colors',
+              activeSection === 'tasks'
+                ? 'bg-indigo-50 text-indigo-700'
+                : 'text-slate-600 hover:bg-slate-50'
+            )}
+          >
             <LayoutDashboard className="w-5 h-5" />
             My Tasks
           </button>
@@ -137,22 +158,28 @@ export const WorkerDashboard = () => {
                     transition={{ delay: i * 0.1 }}
                     className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm"
                   >
-                    <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center mb-4", stat.bg, stat.color)}>
-                      {stat.icon}
-                    </div>
-                    <p className="text-slate-500 text-sm font-medium">{stat.label}</p>
-                    <p className="text-2xl font-bold text-slate-900 mt-1">{stat.value}</p>
+                    <button
+                      type="button"
+                      onClick={() => handleStatClick(stat.status)}
+                      className="w-full text-left"
+                    >
+                      <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center mb-4", stat.bg, stat.color)}>
+                        {stat.icon}
+                      </div>
+                      <p className="text-slate-500 text-sm font-medium">{stat.label}</p>
+                      <p className="text-2xl font-bold text-slate-900 mt-1">{stat.value}</p>
+                    </button>
                   </motion.div>
                 ))}
               </div>
 
               <div id="worker-tasks" className="grid grid-cols-1 md:grid-cols-2 gap-6 scroll-mt-24">
-                {complaints.length === 0 ? (
+                {filteredComplaints.length === 0 ? (
                   <div className="col-span-full py-12 text-center text-slate-500 bg-white rounded-2xl border border-dashed border-slate-200">
                     You have no assigned tasks at the moment.
                   </div>
                 ) : (
-                  complaints.map(complaint => (
+                  filteredComplaints.map(complaint => (
                     <ComplaintCard 
                       key={complaint.id} 
                       complaint={complaint} 
@@ -169,5 +196,3 @@ export const WorkerDashboard = () => {
     </div>
   );
 };
-
-import { cn } from '../lib/utils';

@@ -17,6 +17,7 @@ export const CitizenDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [photoCaptureError, setPhotoCaptureError] = useState('');
+  const [activeSection, setActiveSection] = useState<'dashboard' | 'reports'>('dashboard');
   
   const [newComplaint, setNewComplaint] = useState({
     title: '',
@@ -29,7 +30,8 @@ export const CitizenDashboard = () => {
     capture_accuracy: null as number | null,
   });
 
-  const scrollToSection = (id: string) => {
+  const scrollToSection = (id: string, section: 'dashboard' | 'reports') => {
+    setActiveSection(section);
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
@@ -112,8 +114,8 @@ export const CitizenDashboard = () => {
         icon={<LayoutDashboard className="w-6 h-6" />}
         accentClassName="text-emerald-600"
         navItems={[
-          { label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" />, onClick: () => scrollToSection('citizen-top'), active: true },
-          { label: 'My Reports', icon: <History className="w-5 h-5" />, onClick: () => scrollToSection('citizen-reports') },
+          { label: 'Dashboard', icon: <LayoutDashboard className="w-5 h-5" />, onClick: () => scrollToSection('citizen-top', 'dashboard'), active: activeSection === 'dashboard' },
+          { label: 'My Reports', icon: <History className="w-5 h-5" />, onClick: () => scrollToSection('citizen-reports', 'reports'), active: activeSection === 'reports' },
         ]}
         onClose={() => setIsMobileNavOpen(false)}
         onLogout={logout}
@@ -129,11 +131,29 @@ export const CitizenDashboard = () => {
           </div>
         </div>
         <nav className="flex-1 p-4 space-y-2">
-          <button className="w-full flex items-center gap-3 px-4 py-2.5 bg-emerald-50 text-emerald-700 rounded-lg font-medium">
+          <button
+            type="button"
+            onClick={() => scrollToSection('citizen-top', 'dashboard')}
+            className={cn(
+              'w-full flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium transition-colors',
+              activeSection === 'dashboard'
+                ? 'bg-emerald-50 text-emerald-700'
+                : 'text-slate-600 hover:bg-slate-50'
+            )}
+          >
             <LayoutDashboard className="w-5 h-5" />
             Dashboard
           </button>
-          <button className="w-full flex items-center gap-3 px-4 py-2.5 text-slate-600 hover:bg-slate-50 rounded-lg font-medium transition-colors">
+          <button
+            type="button"
+            onClick={() => scrollToSection('citizen-reports', 'reports')}
+            className={cn(
+              'w-full flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium transition-colors',
+              activeSection === 'reports'
+                ? 'bg-emerald-50 text-emerald-700'
+                : 'text-slate-600 hover:bg-slate-50'
+            )}
+          >
             <History className="w-5 h-5" />
             My Reports
           </button>
@@ -170,25 +190,29 @@ export const CitizenDashboard = () => {
             <div className="flex justify-center py-20">
               <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
             </div>
-          ) : complaints.length === 0 ? (
-            <div className="bg-white border-2 border-dashed border-slate-200 rounded-2xl p-12 text-center">
-              <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                <FileText className="w-8 h-8 text-slate-300" />
-              </div>
-              <h3 className="text-lg font-semibold text-slate-900">No reports yet</h3>
-              <p className="text-slate-500 mb-6">Start by reporting a waste-related issue in your neighborhood.</p>
-              <button 
-                onClick={() => setIsModalOpen(true)}
-                className="text-emerald-600 font-semibold hover:underline"
-              >
-                Create your first report
-              </button>
-            </div>
           ) : (
-            <div id="citizen-reports" className="grid grid-cols-1 md:grid-cols-2 gap-6 scroll-mt-24">
-              {complaints.map(complaint => (
-                <ComplaintCard key={complaint.id} complaint={complaint} />
-              ))}
+            <div id="citizen-reports" className="scroll-mt-24">
+              {complaints.length === 0 ? (
+                <div className="bg-white border-2 border-dashed border-slate-200 rounded-2xl p-12 text-center">
+                  <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <FileText className="w-8 h-8 text-slate-300" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-slate-900">No reports yet</h3>
+                  <p className="text-slate-500 mb-6">Start by reporting a waste-related issue in your neighborhood.</p>
+                  <button 
+                    onClick={() => setIsModalOpen(true)}
+                    className="text-emerald-600 font-semibold hover:underline"
+                  >
+                    Create your first report
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {complaints.map(complaint => (
+                    <ComplaintCard key={complaint.id} complaint={complaint} />
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>
