@@ -16,9 +16,28 @@ export const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('ALL');
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState<'overview' | 'analytics' | 'workers'>('overview');
 
-  const scrollToSection = (id: string) => {
+  const scrollToSection = (id: string, section: 'overview' | 'analytics' | 'workers') => {
+    setActiveSection(section);
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
+  const handleStatClick = (label: string) => {
+    if (label === 'Pending') {
+      setFilter('PENDING');
+      scrollToSection('admin-workers', 'workers');
+      return;
+    }
+
+    if (label === 'Resolved') {
+      setFilter('RESOLVED');
+      scrollToSection('admin-workers', 'workers');
+      return;
+    }
+
+    setFilter('ALL');
+    scrollToSection('admin-workers', 'workers');
   };
 
   useEffect(() => {
@@ -96,9 +115,9 @@ export const AdminDashboard = () => {
         icon={<ShieldCheck className="w-6 h-6" />}
         accentClassName="text-emerald-600"
         navItems={[
-          { label: 'Overview', icon: <LayoutDashboard className="w-5 h-5" />, onClick: () => scrollToSection('admin-overview'), active: true },
-          { label: 'Analytics', icon: <BarChart3 className="w-5 h-5" />, onClick: () => scrollToSection('admin-analytics') },
-          { label: 'Workers', icon: <Users className="w-5 h-5" />, onClick: () => scrollToSection('admin-workers') },
+          { label: 'Overview', icon: <LayoutDashboard className="w-5 h-5" />, onClick: () => scrollToSection('admin-overview', 'overview'), active: activeSection === 'overview' },
+          { label: 'Analytics', icon: <BarChart3 className="w-5 h-5" />, onClick: () => scrollToSection('admin-analytics', 'analytics'), active: activeSection === 'analytics' },
+          { label: 'Workers', icon: <Users className="w-5 h-5" />, onClick: () => scrollToSection('admin-workers', 'workers'), active: activeSection === 'workers' },
         ]}
         onClose={() => setIsMobileNavOpen(false)}
         onLogout={logout}
@@ -114,15 +133,42 @@ export const AdminDashboard = () => {
           </div>
         </div>
         <nav className="flex-1 p-4 space-y-2">
-          <button className="w-full flex items-center gap-3 px-4 py-2.5 bg-emerald-50 text-emerald-700 rounded-lg font-medium">
+          <button
+            type="button"
+            onClick={() => scrollToSection('admin-overview', 'overview')}
+            className={cn(
+              'w-full flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium transition-colors',
+              activeSection === 'overview'
+                ? 'bg-emerald-50 text-emerald-700'
+                : 'text-slate-600 hover:bg-slate-50'
+            )}
+          >
             <LayoutDashboard className="w-5 h-5" />
             Overview
           </button>
-          <button className="w-full flex items-center gap-3 px-4 py-2.5 text-slate-600 hover:bg-slate-50 rounded-lg font-medium transition-colors">
+          <button
+            type="button"
+            onClick={() => scrollToSection('admin-analytics', 'analytics')}
+            className={cn(
+              'w-full flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium transition-colors',
+              activeSection === 'analytics'
+                ? 'bg-emerald-50 text-emerald-700'
+                : 'text-slate-600 hover:bg-slate-50'
+            )}
+          >
             <BarChart3 className="w-5 h-5" />
             Analytics
           </button>
-          <button className="w-full flex items-center gap-3 px-4 py-2.5 text-slate-600 hover:bg-slate-50 rounded-lg font-medium transition-colors">
+          <button
+            type="button"
+            onClick={() => scrollToSection('admin-workers', 'workers')}
+            className={cn(
+              'w-full flex items-center gap-3 px-4 py-2.5 rounded-lg font-medium transition-colors',
+              activeSection === 'workers'
+                ? 'bg-emerald-50 text-emerald-700'
+                : 'text-slate-600 hover:bg-slate-50'
+            )}
+          >
             <Users className="w-5 h-5" />
             Workers
           </button>
@@ -162,11 +208,17 @@ export const AdminDashboard = () => {
                     transition={{ delay: i * 0.1 }}
                     className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm"
                   >
-                    <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center mb-4", stat.bg, stat.color)}>
-                      {stat.icon}
-                    </div>
-                    <p className="text-slate-500 text-sm font-medium">{stat.label}</p>
-                    <p className="text-2xl font-bold text-slate-900 mt-1">{stat.value}</p>
+                    <button
+                      type="button"
+                      onClick={() => handleStatClick(stat.label)}
+                      className="w-full text-left"
+                    >
+                      <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center mb-4", stat.bg, stat.color)}>
+                        {stat.icon}
+                      </div>
+                      <p className="text-slate-500 text-sm font-medium">{stat.label}</p>
+                      <p className="text-2xl font-bold text-slate-900 mt-1">{stat.value}</p>
+                    </button>
                   </motion.div>
                 ))}
               </div>
@@ -186,7 +238,10 @@ export const AdminDashboard = () => {
                     <Filter className="w-4 h-4 text-slate-400" />
                     <select 
                       value={filter}
-                      onChange={(e) => setFilter(e.target.value)}
+                      onChange={(e) => {
+                        setFilter(e.target.value);
+                        setActiveSection('workers');
+                      }}
                       className="text-sm border border-slate-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 w-full sm:w-auto"
                     >
                       <option value="ALL">All Status</option>
