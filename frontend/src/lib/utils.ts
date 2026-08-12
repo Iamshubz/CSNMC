@@ -1,3 +1,7 @@
+export function cn(...inputs: Array<string | false | null | undefined>) {
+  return inputs.filter(Boolean).join(' ');
+}
+
 const API_URL = import.meta.env.VITE_API_URL || '';
 
 export const fetchApi = async (
