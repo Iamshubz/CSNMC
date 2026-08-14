@@ -16,3 +16,6 @@ metadata.json
 
 # Local data file
 waste_management.db
+node_modules/
+.env
+.DS_Store

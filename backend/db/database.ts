@@ -1,53 +1,53 @@
-import path from "path";
-import Database from "better-sqlite3";
+import { Pool } from "pg";
 
-const dbPath = path.resolve(__dirname, "../../waste_management.db");
-const db = new Database(dbPath);
+const connectionString = process.env.DATABASE_URL;
 
-// Initialize Database
-db.exec(`
-  CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    email TEXT UNIQUE NOT NULL,
-    password TEXT NOT NULL,
-    role TEXT NOT NULL,
-    name TEXT NOT NULL
-  );
+if (!connectionString) {
+  throw new Error("DATABASE_URL is not configured");
+}
 
-  CREATE TABLE IF NOT EXISTS complaints (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    title TEXT NOT NULL,
-    description TEXT NOT NULL,
-    location TEXT NOT NULL,
-    category TEXT,
-    status TEXT DEFAULT 'PENDING',
-    citizen_id INTEGER NOT NULL,
-    worker_id INTEGER,
-    image_url TEXT,
-    proof_image_url TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (citizen_id) REFERENCES users(id),
-    FOREIGN KEY (worker_id) REFERENCES users(id)
-  );
-`);
+const db = new Pool({
+  connectionString,
+  ssl:
+    process.env.NODE_ENV === "production"
+      ? { rejectUnauthorized: false }
+      : undefined,
+});
 
-const complaintColumns = db.prepare("PRAGMA table_info(complaints)").all() as Array<{ name: string }>;
-const complaintColumnNames = new Set(complaintColumns.map((column) => column.name));
+export const initDatabase = async () => {
+  await db.query(`
+    CREATE TABLE IF NOT EXISTS users (
+      id SERIAL PRIMARY KEY,
+      email TEXT UNIQUE NOT NULL,
+      password TEXT NOT NULL,
+      role TEXT NOT NULL,
+      name TEXT NOT NULL
+    );
 
-const ensureComplaintColumn = (name: string, definition: string) => {
-  if (!complaintColumnNames.has(name)) {
-    db.prepare(`ALTER TABLE complaints ADD COLUMN ${definition}`).run();
-    complaintColumnNames.add(name);
-  }
+    CREATE TABLE IF NOT EXISTS complaints (
+      id SERIAL PRIMARY KEY,
+      title TEXT NOT NULL,
+      description TEXT NOT NULL,
+      location TEXT NOT NULL,
+      category TEXT,
+      status TEXT DEFAULT 'PENDING',
+      citizen_id INTEGER NOT NULL REFERENCES users(id),
+      worker_id INTEGER REFERENCES users(id),
+      image_url TEXT,
+      proof_image_url TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      captured_at TEXT,
+      capture_latitude DOUBLE PRECISION,
+      capture_longitude DOUBLE PRECISION,
+      capture_accuracy DOUBLE PRECISION,
+      risk_score INTEGER DEFAULT 0,
+      risk_level TEXT DEFAULT 'LOW',
+      risk_reason TEXT,
+      moderation_status TEXT DEFAULT 'AUTO_APPROVED'
+    );
+  `);
+
+  console.log("PostgreSQL database initialized");
 };
-
-ensureComplaintColumn("captured_at", "captured_at TEXT");
-ensureComplaintColumn("capture_latitude", "capture_latitude REAL");
-ensureComplaintColumn("capture_longitude", "capture_longitude REAL");
-ensureComplaintColumn("capture_accuracy", "capture_accuracy REAL");
-ensureComplaintColumn("risk_score", "risk_score INTEGER DEFAULT 0");
-ensureComplaintColumn("risk_level", "risk_level TEXT DEFAULT 'LOW'");
-ensureComplaintColumn("risk_reason", "risk_reason TEXT");
-ensureComplaintColumn("moderation_status", "moderation_status TEXT DEFAULT 'AUTO_APPROVED'");
 
 export default db;
