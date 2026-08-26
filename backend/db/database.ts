@@ -6,6 +6,17 @@ if (!connectionString) {
   throw new Error("DATABASE_URL is not configured");
 }
 
+//fix: enable SSL for Render PostgreSQL connection
+
+// const db = new Pool({
+//   connectionString,
+//   ssl: {
+//     rejectUnauthorized: false,
+//   },
+// });
+
+//Earlier code
+
 const db = new Pool({
   connectionString,
   ssl:
@@ -43,8 +54,12 @@ export const initDatabase = async () => {
       risk_score INTEGER DEFAULT 0,
       risk_level TEXT DEFAULT 'LOW',
       risk_reason TEXT,
-      moderation_status TEXT DEFAULT 'AUTO_APPROVED'
+      moderation_status TEXT DEFAULT 'AUTO_APPROVED',
+      duplicate_count INTEGER NOT NULL DEFAULT 0
     );
+
+    ALTER TABLE complaints
+    ADD COLUMN IF NOT EXISTS duplicate_count INTEGER NOT NULL DEFAULT 0;
   `);
 
   console.log("PostgreSQL database initialized");
