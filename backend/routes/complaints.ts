@@ -1,6 +1,11 @@
 import express from "express";
 import db from "../db/database";
 import { authenticateToken } from "../middleware/auth";
+import {
+  calculateDistanceInMeters,
+  DUPLICATE_RADIUS_METERS,
+  getBoundingBox,
+} from "../utils/geoUtils";
 
 const router = express.Router();
 
@@ -13,6 +18,12 @@ type ComplaintPayload = {
   capture_latitude?: number | string | null;
   capture_longitude?: number | string | null;
   capture_accuracy?: number | string | null;
+};
+
+type ActiveComplaintLocation = {
+  id: number;
+  capture_latitude: number;
+  capture_longitude: number;
 };
 
 const toNumber = (value: number | string | null | undefined) => {
@@ -239,6 +250,60 @@ router.post("/", authenticateToken, async (req: any, res) => {
       return res.status(400).json({
         error: "Capture timestamp is required",
       });
+    }
+
+    if (captureLatitude !== null && captureLongitude !== null) {
+      const boundingBox = getBoundingBox(
+        captureLatitude,
+        captureLongitude,
+        DUPLICATE_RADIUS_METERS
+      );
+
+      const activeComplaints = await db.query<ActiveComplaintLocation>(
+        `
+        SELECT id, capture_latitude, capture_longitude
+        FROM complaints
+        WHERE status IN ('PENDING', 'ASSIGNED', 'IN_PROGRESS')
+          AND capture_latitude BETWEEN $1 AND $2
+          AND capture_longitude BETWEEN $3 AND $4
+        ORDER BY created_at ASC
+        `,
+        [
+          boundingBox.minLatitude,
+          boundingBox.maxLatitude,
+          boundingBox.minLongitude,
+          boundingBox.maxLongitude,
+        ]
+      );
+
+      const primaryComplaint = activeComplaints.rows.find(
+        (complaint) =>
+          calculateDistanceInMeters(
+            captureLatitude,
+            captureLongitude,
+            complaint.capture_latitude,
+            complaint.capture_longitude
+          ) <= DUPLICATE_RADIUS_METERS
+      );
+
+      if (primaryComplaint) {
+        await db.query(
+          `
+          UPDATE complaints
+          SET duplicate_count = duplicate_count + 1
+          WHERE id = $1
+            AND status IN ('PENDING', 'ASSIGNED', 'IN_PROGRESS')
+          `,
+          [primaryComplaint.id]
+        );
+
+        return res.status(200).json({
+          success: true,
+          isDuplicate: true,
+          message:
+            "A complaint for this location has already been reported by another citizen and is currently being addressed. We have recorded your report to increase its priority!",
+        });
+      }
     }
 
     let category = "General";

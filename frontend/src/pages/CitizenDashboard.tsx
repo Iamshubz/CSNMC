@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Plus, MapPin, FileText, Send, X, Loader2, History, LayoutDashboard, LogOut, Menu } from 'lucide-react';
+import { Plus, MapPin, FileText, Send, X, Loader2, History, LayoutDashboard, LogOut, Menu, Info } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { fetchApi } from '../lib/utils';
 import { Complaint } from '../types';
@@ -17,6 +17,7 @@ export const CitizenDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [photoCaptureError, setPhotoCaptureError] = useState('');
+  const [duplicateFeedback, setDuplicateFeedback] = useState('');
   const [activeSection, setActiveSection] = useState<'dashboard' | 'reports'>('dashboard');
   
   const [newComplaint, setNewComplaint] = useState({
@@ -59,10 +60,11 @@ export const CitizenDashboard = () => {
 
     setSubmitting(true);
     try {
-      await fetchApi('/api/complaints', {
+      const response = await fetchApi('/api/complaints', {
         method: 'POST',
         body: JSON.stringify(newComplaint),
       });
+
       setIsModalOpen(false);
       setNewComplaint({
         title: '',
@@ -75,6 +77,13 @@ export const CitizenDashboard = () => {
         capture_accuracy: null,
       });
       setPhotoCaptureError('');
+
+      if (response.isDuplicate === true) {
+        setDuplicateFeedback(response.message);
+      } else {
+        setDuplicateFeedback('');
+      }
+
       loadComplaints();
     } catch (err) {
       console.error(err);
@@ -185,6 +194,13 @@ export const CitizenDashboard = () => {
               Report Issue
             </button>
           </header>
+
+          {duplicateFeedback && (
+            <div className="mb-6 flex items-start gap-3 rounded-xl border border-sky-200 bg-sky-50 px-4 py-3 text-sky-900" role="status">
+              <Info className="mt-0.5 h-5 w-5 shrink-0 text-sky-600" />
+              <p className="text-sm font-medium">{duplicateFeedback}</p>
+            </div>
+          )}
 
           {loading ? (
             <div className="flex justify-center py-20">
