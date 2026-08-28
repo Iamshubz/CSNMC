@@ -17,16 +17,15 @@ if (!connectionString) {
 
 //Earlier code
 
-const db = new Pool({
-  connectionString,
-  ssl:
-    process.env.NODE_ENV === "production"
-      ? { rejectUnauthorized: false }
-      : undefined,
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
 
 export const initDatabase = async () => {
-  await db.query(`
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS users (
       id SERIAL PRIMARY KEY,
       email TEXT UNIQUE NOT NULL,
@@ -65,4 +64,4 @@ export const initDatabase = async () => {
   console.log("PostgreSQL database initialized");
 };
 
-export default db;
+export default pool;
