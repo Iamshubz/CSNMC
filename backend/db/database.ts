@@ -45,6 +45,7 @@ export const initDatabase = async () => {
       worker_id INTEGER REFERENCES users(id),
       image_url TEXT,
       proof_image_url TEXT,
+      completed_at TIMESTAMP,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       captured_at TEXT,
       capture_latitude DOUBLE PRECISION,
@@ -59,6 +60,9 @@ export const initDatabase = async () => {
 
     ALTER TABLE complaints
     ADD COLUMN IF NOT EXISTS duplicate_count INTEGER NOT NULL DEFAULT 0;
+
+    ALTER TABLE complaints
+    ADD COLUMN IF NOT EXISTS completed_at TIMESTAMP;
   `);
 
   console.log("PostgreSQL database initialized");

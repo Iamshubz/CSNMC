@@ -1,4 +1,5 @@
 import express from "express";
+import multer from "multer";
 import db from "../db/database";
 import { authenticateToken } from "../middleware/auth";
 import {
@@ -8,6 +9,10 @@ import {
 } from "../utils/geoUtils";
 
 const router = express.Router();
+const proofUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 },
+});
 
 type ComplaintPayload = {
   title?: string;
@@ -382,6 +387,119 @@ router.post("/", authenticateToken, async (req: any, res) => {
 });
 
 // UPDATE complaint
+router.patch("/:id/status", authenticateToken, async (req: any, res) => {
+  try {
+    if (req.user.role !== "WORKER" || req.body.status !== "IN_PROGRESS") {
+      return res.sendStatus(403);
+    }
+
+    const result = await db.query(
+      `
+      UPDATE complaints
+      SET status = 'IN_PROGRESS'
+      WHERE id = $1
+        AND worker_id = $2
+        AND status = 'ASSIGNED'
+      RETURNING id
+      `,
+      [req.params.id, req.user.id]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Assigned complaint not found" });
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Start complaint error:", error);
+    res.status(500).json({ error: "Failed to start complaint" });
+  }
+});
+
+router.post(
+  "/:id/resolve",
+  authenticateToken,
+  proofUpload.single("image"),
+  async (req: any, res) => {
+    try {
+      if (req.user.role !== "WORKER") {
+        return res.sendStatus(403);
+      }
+
+      const latitude = toNumber(req.body.latitude);
+      const longitude = toNumber(req.body.longitude);
+      const proofImage = req.file;
+
+      if (!proofImage || latitude === null || longitude === null) {
+        return res.status(400).json({
+          success: false,
+          message: "A proof image and GPS coordinates are required.",
+        });
+      }
+
+      const complaintResult = await db.query(
+        `
+        SELECT id, worker_id, status, capture_latitude, capture_longitude
+        FROM complaints
+        WHERE id = $1
+        `,
+        [req.params.id]
+      );
+      const complaint = complaintResult.rows[0];
+
+      if (!complaint || complaint.worker_id !== req.user.id) {
+        return res.status(404).json({ success: false, message: "Complaint not found" });
+      }
+
+      if (complaint.status !== "IN_PROGRESS") {
+        return res.status(400).json({
+          success: false,
+          message: "Complaint must be in progress before proof can be submitted.",
+        });
+      }
+
+      if (complaint.capture_latitude === null || complaint.capture_longitude === null) {
+        return res.status(400).json({
+          success: false,
+          message: "Location mismatch: The reported site has no GPS coordinates.",
+        });
+      }
+
+      const distance = calculateDistanceInMeters(
+        latitude,
+        longitude,
+        complaint.capture_latitude,
+        complaint.capture_longitude
+      );
+
+      if (distance > 100) {
+        return res.status(400).json({
+          success: false,
+          message: "Location mismatch: You must be at the reported site (within 100m) to submit proof.",
+        });
+      }
+
+      const proofImageUrl = `data:${proofImage.mimetype};base64,${proofImage.buffer.toString("base64")}`;
+      await db.query(
+        `
+        UPDATE complaints
+        SET proof_image_url = $1,
+            status = 'RESOLVED',
+            completed_at = CURRENT_TIMESTAMP
+        WHERE id = $2
+          AND worker_id = $3
+        `,
+        [proofImageUrl, req.params.id, req.user.id]
+      );
+
+      res.status(200).json({ success: true, message: "Task resolved successfully" });
+    } catch (error) {
+      console.error("Resolve complaint error:", error);
+      res.status(500).json({ success: false, message: "Failed to resolve complaint" });
+    }
+  }
+);
+
 router.put("/:id", authenticateToken, async (req: any, res) => {
   try {
     const { id } = req.params;
@@ -398,6 +516,12 @@ router.put("/:id", authenticateToken, async (req: any, res) => {
         [status, worker_id, id]
       );
     } else if (req.user.role === "WORKER") {
+      if (status !== "IN_PROGRESS") {
+        return res.status(403).json({
+          error: "Workers must submit camera proof to resolve a complaint",
+        });
+      }
+
       await db.query(
         `
         UPDATE complaints

@@ -42,8 +42,8 @@ export const WorkerDashboard = () => {
 
   const handleUpdateStatus = async (id: number, status: string) => {
     try {
-      await fetchApi(`/api/complaints/${id}`, {
-        method: 'PUT',
+      await fetchApi(status === 'IN_PROGRESS' ? `/api/complaints/${id}/status` : `/api/complaints/${id}`, {
+        method: status === 'IN_PROGRESS' ? 'PATCH' : 'PUT',
         body: JSON.stringify({ status }),
       });
       loadComplaints();
@@ -185,6 +185,7 @@ export const WorkerDashboard = () => {
                       complaint={complaint} 
                       isWorker
                       onUpdateStatus={handleUpdateStatus}
+                      onProofSubmitted={loadComplaints}
                     />
                   ))
                 )}
