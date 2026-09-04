@@ -11,7 +11,7 @@ export const fetchApi = async (
   const token = localStorage.getItem('token');
 
   const headers = {
-    'Content-Type': 'application/json',
+    ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...options.headers,
   };
@@ -26,7 +26,7 @@ export const fetchApi = async (
       .json()
       .catch(() => ({ error: 'An error occurred' }));
 
-    throw new Error(error.error || 'Request failed');
+    throw new Error(error.error || error.message || 'Request failed');
   }
 
   return response.json();

@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Trash2, CheckCircle2, Clock, AlertCircle, MapPin, User as UserIcon, Image as ImageIcon } from 'lucide-react';
+import { CheckCircle2, Clock, AlertCircle, MapPin, User as UserIcon } from 'lucide-react';
 import { Complaint } from '../types';
 import { cn } from '../lib/utils';
+import { WorkerProofModal } from './WorkerProofModal';
 
 interface ComplaintCardProps {
   complaint: Complaint;
@@ -11,6 +12,7 @@ interface ComplaintCardProps {
   isWorker?: boolean;
   workers?: { id: number; name: string }[];
   onAssign?: (id: number, workerId: number) => void;
+  onProofSubmitted?: () => void;
 }
 
 const statusColors = {
@@ -39,8 +41,11 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
   isAdmin, 
   isWorker,
   workers,
-  onAssign
+  onAssign,
+  onProofSubmitted,
 }) => {
+  const [isProofModalOpen, setIsProofModalOpen] = useState(false);
+
   return (
     <motion.div 
       initial={{ opacity: 0, y: 10 }}
@@ -79,7 +84,7 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
         <span className="truncate">{complaint.location}</span>
       </div>
 
-      {complaint.image_url && (
+      {complaint.image_url && complaint.status !== 'RESOLVED' && (
         <div className="mb-4 rounded-lg overflow-hidden border border-slate-100 bg-slate-50 aspect-video flex items-center justify-center">
           <img 
             src={complaint.image_url} 
@@ -87,6 +92,19 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
             className="w-full h-full object-cover"
             referrerPolicy="no-referrer"
           />
+        </div>
+      )}
+
+      {complaint.status === 'RESOLVED' && complaint.proof_image_url && (
+        <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div>
+            <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">Before</p>
+            <img src={complaint.image_url} alt="Before cleanup" className="aspect-video w-full rounded-lg border border-slate-100 object-cover" />
+          </div>
+          <div>
+            <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-slate-500">After</p>
+            <img src={complaint.proof_image_url} alt="After cleanup" className="aspect-video w-full rounded-lg border border-slate-100 object-cover" />
+          </div>
         </div>
       )}
 
@@ -136,20 +154,38 @@ export const ComplaintCard: React.FC<ComplaintCardProps> = ({
                 onClick={() => onUpdateStatus?.(complaint.id, 'IN_PROGRESS')}
                 className="text-xs bg-indigo-600 text-white px-3 py-2 rounded-md hover:bg-indigo-700 transition-colors w-full sm:w-auto"
               >
-                Start Work
+                Accept &amp; Start
               </button>
             )}
             {complaint.status === 'IN_PROGRESS' && (
               <button 
-                onClick={() => onUpdateStatus?.(complaint.id, 'RESOLVED')}
+                onClick={() => setIsProofModalOpen(true)}
                 className="text-xs bg-emerald-600 text-white px-3 py-2 rounded-md hover:bg-emerald-700 transition-colors w-full sm:w-auto"
               >
-                Mark Resolved
+                Capture Proof &amp; Resolve
               </button>
             )}
           </div>
         )}
+
+        {isWorker && complaint.status === 'RESOLVED' && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-3 py-2 text-xs font-semibold text-emerald-700">
+            <CheckCircle2 className="h-4 w-4" />
+            Resolved ✓
+          </span>
+        )}
       </div>
+
+      {isWorker && isProofModalOpen && (
+        <WorkerProofModal
+          complaintId={complaint.id}
+          onClose={() => setIsProofModalOpen(false)}
+          onSubmitted={() => {
+            setIsProofModalOpen(false);
+            onProofSubmitted?.();
+          }}
+        />
+      )}
     </motion.div>
   );
 };
