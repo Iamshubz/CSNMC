@@ -8,6 +8,7 @@ import { ComplaintCard } from '../components/ComplaintCard';
 import { cn } from '../lib/utils';
 import { MobileSidebar } from '../components/MobileSidebar';
 import { LiveCameraCapture, type CaptureMetadata } from '../components/LiveCameraCapture';
+import { BrandLockup } from '../components/AuthShell';
 
 export const CitizenDashboard = () => {
   const { user, logout } = useAuth();
@@ -134,10 +135,7 @@ export const CitizenDashboard = () => {
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-slate-200 hidden md:flex flex-col">
         <div className="p-6 border-b border-slate-100">
-          <div className="flex items-center gap-2 text-emerald-600 font-bold text-xl">
-            <LayoutDashboard className="w-6 h-6" />
-            EcoTrack
-          </div>
+          <BrandLockup compact />
         </div>
         <nav className="flex-1 p-4 space-y-2">
           <button

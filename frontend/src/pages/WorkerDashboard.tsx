@@ -6,6 +6,7 @@ import { fetchApi, cn } from '../lib/utils';
 import { Complaint } from '../types';
 import { ComplaintCard } from '../components/ComplaintCard';
 import { MobileSidebar } from '../components/MobileSidebar';
+import { BrandLockup } from '../components/AuthShell';
 
 export const WorkerDashboard = () => {
   const { user, logout } = useAuth();
@@ -103,9 +104,9 @@ export const WorkerDashboard = () => {
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r border-slate-200 hidden md:flex flex-col">
         <div className="p-6 border-b border-slate-100">
-          <div className="flex items-center gap-2 text-indigo-600 font-bold text-xl">
-            <Briefcase className="w-6 h-6" />
-            EcoTrack Worker
+          <div className="flex items-center gap-2">
+            <BrandLockup compact />
+            <span className="border-l border-slate-200 pl-2 text-xs font-bold text-slate-500">Worker</span>
           </div>
         </div>
         <nav className="flex-1 p-4 space-y-2">

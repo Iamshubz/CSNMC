@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'motion/react';
-import { UserPlus, Mail, Lock, User as UserIcon, Loader2, Leaf, ShieldCheck } from 'lucide-react';
+import { UserPlus, Mail, Lock, User as UserIcon, Loader2 } from 'lucide-react';
 import { fetchApi, cn } from '../lib/utils';
+import { AuthShell } from '../components/AuthShell';
 
 export const RegisterPage = () => {
   const [formData, setFormData] = useState({
@@ -33,29 +34,18 @@ export const RegisterPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4 sm:p-6">
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="max-w-md w-full bg-white rounded-2xl shadow-xl border border-slate-100 p-6 sm:p-8"
-      >
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 mb-4">
-            <Leaf className="w-6 h-6" />
-          </div>
-          <h1 className="text-2xl font-bold text-slate-900">Create Account</h1>
-          <p className="text-slate-500 mt-2">Join EcoTrack to keep your city clean</p>
-        </div>
+    <AuthShell eyebrow="Join the movement" title="Create Account" subtitle="Create your SafaiSetu account to report issues, follow progress, and help keep Sambhajinagar clean." footer={<>Already have an account? <Link to="/login" className="font-bold text-[#087443] hover:underline">Sign in here</Link></>}>
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}>
 
         {error && (
-          <div className="mb-6 p-3 bg-red-50 border border-red-100 text-red-600 text-sm rounded-lg">
+          <div className="mb-6 rounded-lg border border-red-100 bg-red-50 p-3 text-sm text-red-600">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Full Name</label>
+            <label className="mb-1 block text-xs font-bold text-[#374d43]">Full Name</label>
             <div className="relative">
               <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input 
@@ -63,14 +53,14 @@ export const RegisterPage = () => {
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
-                placeholder="John Doe"
+                className="w-full rounded-lg border border-[#dce9e1] py-3 pl-10 pr-4 text-sm focus:outline-none"
+                placeholder="Enter your full name"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
+            <label className="mb-1 block text-xs font-bold text-[#374d43]">Email Address</label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input 
@@ -78,14 +68,14 @@ export const RegisterPage = () => {
                 required
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
+                className="w-full rounded-lg border border-[#dce9e1] py-3 pl-10 pr-4 text-sm focus:outline-none"
                 placeholder="name@example.com"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Password</label>
+            <label className="mb-1 block text-xs font-bold text-[#374d43]">Password</label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input 
@@ -93,14 +83,14 @@ export const RegisterPage = () => {
                 required
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
-                placeholder="••••••••"
+                className="w-full rounded-lg border border-[#dce9e1] py-3 pl-10 pr-4 text-sm focus:outline-none"
+                placeholder="Create a password"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">I am a...</label>
+            <label className="mb-1 block text-xs font-bold text-[#374d43]">I am a...</label>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               {['CITIZEN', 'WORKER', 'ADMIN'].map((role) => (
                 <button
@@ -108,10 +98,10 @@ export const RegisterPage = () => {
                   type="button"
                   onClick={() => setFormData({ ...formData, role })}
                   className={cn(
-                    "py-2 text-xs font-semibold rounded-lg border transition-all",
+                    "rounded-lg border py-2.5 text-xs font-semibold transition-all",
                     formData.role === role 
-                      ? "bg-emerald-600 border-emerald-600 text-white" 
-                      : "bg-white border-slate-200 text-slate-600 hover:border-emerald-200"
+                      ? "border-[#087443] bg-[#087443] text-white"
+                      : "border-[#dce9e1] bg-white text-slate-600 hover:border-[#9bcbaa]"
                   )}
                 >
                   {role}
@@ -123,17 +113,14 @@ export const RegisterPage = () => {
           <button 
             type="submit" 
             disabled={loading}
-            className="w-full bg-emerald-600 text-white py-2 rounded-lg font-semibold hover:bg-emerald-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-70"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#087443] py-3 font-bold text-white transition-colors hover:bg-[#075431] disabled:opacity-70"
           >
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <UserPlus className="w-4 h-4" />}
             Create Account
           </button>
         </form>
 
-        <p className="text-center mt-6 text-sm text-slate-600">
-          Already have an account? <Link to="/login" className="text-emerald-600 font-semibold hover:underline">Sign in here</Link>
-        </p>
       </motion.div>
-    </div>
+    </AuthShell>
   );
 };
