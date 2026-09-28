@@ -7,6 +7,7 @@ import { RegisterPage } from './pages/RegisterPage';
 import { CitizenDashboard } from './pages/CitizenDashboard';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { WorkerDashboard } from './pages/WorkerDashboard';
+import { AdminWorkersPage } from './pages/AdminWorkersPage';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode; role?: string }> = ({ children, role }) => {
   const { user, loading } = useAuth();
@@ -43,6 +44,15 @@ export default function App() {
                 <AdminDashboard />
               </ProtectedRoute>
             } 
+          />
+
+          <Route
+            path="/admin/workers"
+            element={
+              <ProtectedRoute role="ADMIN">
+                <AdminWorkersPage />
+              </ProtectedRoute>
+            }
           />
           
           <Route 

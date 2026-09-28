@@ -10,9 +10,9 @@ import {
   Leaf,
   MapPin,
   Recycle,
-  ShieldCheck,
   Truck,
 } from 'lucide-react';
+import { BrandLockup } from '../components/AuthShell';
 
 const features = [
   { icon: FileText, title: 'Easy Complaint', text: 'Register a waste issue in a few simple steps.', tone: 'green' },
@@ -32,16 +32,9 @@ export const LandingPage = () => {
     <div className="min-h-screen overflow-hidden bg-[#fbfdfb] text-[#17352a]">
       <header className="relative z-20 border-b border-[#dce9e1] bg-white/95">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-5 py-4 sm:px-8 lg:h-[76px] lg:px-10">
-          <Link to="/" className="flex items-center gap-3" aria-label="CSMC home">
-            <div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-[#bd9635] bg-[#f9f4df] text-[#075431] shadow-sm">
-              <ShieldCheck className="h-7 w-7" />
-            </div>
-            <div className="leading-none">
-              <div className="text-base font-black tracking-[0.12em] text-[#075431]">CSMC</div>
-              <div className="mt-1 text-[9px] font-semibold uppercase tracking-[0.08em] text-slate-500">Chhatrapati Sambhajinagar</div>
-              <div className="mt-0.5 text-[8px] font-bold uppercase tracking-[0.1em] text-slate-400">Municipal Corporation</div>
-            </div>
-          </Link>
+          <div className="flex items-center gap-3">
+            <BrandLockup compact />
+          </div>
 
           <nav className="hidden items-center gap-7 text-[11px] font-semibold text-slate-600 md:flex">
             <Link className="border-b-2 border-[#087443] pb-1 text-[#087443]" to="/">Home</Link>
@@ -84,7 +77,7 @@ export const LandingPage = () => {
             <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6, delay: 0.12 }} className="relative self-end">
               <div className="absolute -right-20 -top-16 h-56 w-56 rounded-full bg-white/60 blur-3xl" />
               <div className="relative overflow-hidden rounded-t-[22px] border-x border-t border-white/80 bg-[#cfead6] shadow-[0_-8px_30px_rgba(30,100,58,0.1)]">
-                <img src="/csmc-city.png" alt="Chhatrapati Sambhajinagar clean city initiative" className="h-[300px] w-full object-cover object-center opacity-90 mix-blend-multiply sm:h-[400px] lg:h-[480px]" />
+                <img src="/city.png" alt="Chhatrapati Sambhajinagar clean city initiative" className="h-[300px] w-full object-cover object-center opacity-90 mix-blend-multiply sm:h-[400px] lg:h-[480px]" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#075431]/35 via-transparent to-white/25" />
                 <div className="absolute bottom-5 left-5 right-5 flex items-center justify-between rounded-xl border border-white/50 bg-white/80 p-3 backdrop-blur-sm sm:bottom-7 sm:left-7 sm:right-7 sm:p-4">
                   <div className="flex items-center gap-3">
@@ -130,7 +123,7 @@ export const LandingPage = () => {
       </main>
 
       <footer className="border-t border-[#dce9e1] bg-[#f4faf5] py-6">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-5 text-center text-[11px] text-[#71837a] sm:flex-row sm:px-8 sm:text-left lg:px-10"><span className="font-bold text-[#087443]">CSMC · SafaiSetu</span><span>Chhatrapati Sambhajinagar Municipal Corporation</span><span>Clean streets, shared responsibility.</span></div>
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 px-5 text-center text-[11px] text-[#71837a] sm:flex-row sm:px-8 sm:text-left lg:px-10"><span className="font-bold text-[#087443]">EcoTrack · SafaiSetu</span><span>Chhatrapati Sambhajinagar Municipal Corporation</span><span>Clean streets, shared responsibility.</span></div>
       </footer>
     </div>
   );
