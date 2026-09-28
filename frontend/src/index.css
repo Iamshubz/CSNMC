@@ -1,5 +1,15 @@
 @import "tailwindcss";
 
+:root {
+	--csmc-ink: #17352a;
+	--csmc-muted: #71837a;
+	--csmc-green: #087443;
+	--csmc-deep: #075431;
+	--csmc-mint: #eaf7ef;
+	--csmc-line: #dce9e1;
+	--csmc-paper: #f6fbf7;
+}
+
 @layer base {
 	html,
 	body,
@@ -10,10 +20,79 @@
 
 	body {
 		overflow-x: hidden;
-		background: #f8fafc;
+		background: var(--csmc-paper);
+		color: var(--csmc-ink);
+		font-family: "Avenir Next", "Trebuchet MS", system-ui, sans-serif;
+		letter-spacing: 0;
 	}
 
 	* {
 		box-sizing: border-box;
 	}
+
+	button,
+	a,
+	input,
+	textarea,
+	select {
+		transition-duration: 180ms;
+	}
+
+	input,
+	textarea,
+	select {
+		border-color: var(--csmc-line) !important;
+	}
+
+	input:focus,
+	textarea:focus,
+	select:focus {
+		border-color: #45a56f !important;
+		box-shadow: 0 0 0 3px rgba(69, 165, 111, 0.14);
+	}
+}
+
+@layer components {
+	.portal-panel {
+		border: 1px solid var(--csmc-line);
+		border-radius: 14px;
+		background: #fff;
+		box-shadow: 0 8px 24px rgba(29, 78, 53, 0.06);
+	}
+
+	.portal-label {
+		color: var(--csmc-green);
+		font-size: 0.68rem;
+		font-weight: 800;
+		letter-spacing: 0.12em;
+		text-transform: uppercase;
+	}
+}
+
+/* Keeps every dashboard page visually related to the public landing page. */
+[class*="rounded-3xl"],
+[class*="rounded-2xl"] {
+	border-radius: 14px;
+}
+
+[class*="shadow-sm"],
+[class*="shadow-xl"] {
+	box-shadow: 0 8px 24px rgba(29, 78, 53, 0.06);
+}
+
+[class*="bg-emerald-600"] {
+	background-color: var(--csmc-green);
+}
+
+[class*="hover:bg-emerald-700"]:hover {
+	background-color: var(--csmc-deep);
+}
+
+@keyframes portal-reveal {
+	from { opacity: 0; transform: translateY(8px); }
+	to { opacity: 1; transform: translateY(0); }
+}
+
+#root > * {
+	animation: portal-reveal 420ms ease-out both;
 }
