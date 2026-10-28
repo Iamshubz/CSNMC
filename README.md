@@ -6,7 +6,7 @@
 ![TypeScript](https://img.shields.io/badge/Language-TypeScript-blue)
 ![Node.js](https://img.shields.io/badge/Backend-Node.js-green)
 ![Express](https://img.shields.io/badge/Framework-Express-black)
-![SQLite](https://img.shields.io/badge/Database-SQLite-003B57)
+![PostgreSql](https://img.shields.io/badge/Database-SQLite-003B57)
 ![JWT](https://img.shields.io/badge/Auth-JWT-orange)
 ![Groq](https://img.shields.io/badge/AI-Groq-purple)
 
@@ -154,7 +154,7 @@ Groq AI Categorization
 Risk Scoring
    │
    ▼
-Store in SQLite Database
+Store in PostgreSql Database
    │
    ▼
 Admin Dashboard
@@ -185,7 +185,7 @@ Citizen Receives Status Update
                        │
         ┌──────────────┼──────────────┐
         │              │              │
-      JWT Auth      SQLite DB      Groq AI
+      JWT Auth      PostgreSql      Groq AI
         │              │              │
         └──────────────┼──────────────┘
                        │
@@ -213,7 +213,7 @@ Citizen Receives Status Update
 - Node.js
 - Express.js
 - TypeScript
-- SQLite
+- PostgreSQl
 - JWT
 - bcrypt
 - dotenv
