@@ -229,7 +229,7 @@ Citizen Receives Status Update
 
 ## Database
 
-- SQLite
+- PostgreSQL
 
 ---
 
